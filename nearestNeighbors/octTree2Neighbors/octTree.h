@@ -332,11 +332,11 @@ static void sortBlocksBig(vertex** S, int count, int quadrants,
   pintv* blk = newA(pintv,count);
   double blocksize = size/(double)(1 << logdivs);
   point minpt = center.offsetPoint(0,size/2);
-  {cilk_for (int i=0;i< count; i++) 
+  {parallel_for (int i=0;i< count; i++) 
       blk[i] = pintv(ptFindBlock(minpt,blocksize,logdivs,S[i]->pt),
 		    S[i]);}
   intSort::iSort(blk,offsets,count,quadrants,utils::firstF<int,vertex*>());
-  {cilk_for (int i=0;i< count; i++) 
+  {parallel_for (int i=0;i< count; i++) 
       S[i] = blk[i].second;}
   free(blk);
 }
