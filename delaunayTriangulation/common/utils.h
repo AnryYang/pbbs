@@ -97,6 +97,9 @@ inline unsigned int hash2(unsigned int a)
 inline bool LCAS(long *ptr, long oldv, long newv) {
   unsigned char ret;
   /* Note that sete sets a 'byte' not the word */
+#if defined(__arm__)
+  return __sync_bool_compare_and_swap(ptr, oldv, newv);
+#else
   __asm__ __volatile__ (
                 "  lock\n"
                 "  cmpxchgq %2,%1\n"
@@ -104,6 +107,7 @@ inline bool LCAS(long *ptr, long oldv, long newv) {
                 : "=q" (ret), "=m" (*ptr)
                 : "r" (newv), "m" (*ptr), "a" (oldv)
                 : "memory");
+#endif
   return ret;
 }
 
@@ -111,6 +115,9 @@ inline bool LCAS(long *ptr, long oldv, long newv) {
 inline bool SCAS(int *ptr, int oldv, int newv) {
   unsigned char ret;
   /* Note that sete sets a 'byte' not the word */
+#if defined(__arm__)
+  return __sync_bool_compare_and_swap(ptr, oldv, newv);
+#else
   __asm__ __volatile__ (
                 "  lock\n"
                 "  cmpxchgl %2,%1\n"
@@ -118,6 +125,7 @@ inline bool SCAS(int *ptr, int oldv, int newv) {
                 : "=q" (ret), "=m" (*ptr)
                 : "r" (newv), "m" (*ptr), "a" (oldv)
                 : "memory");
+#endif
   return ret;
 }
 
