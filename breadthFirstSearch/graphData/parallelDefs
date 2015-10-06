@@ -1,9 +1,11 @@
+OPENMP=1
+
 ifdef LONG
 INTT = -DLONG
 endif
 
 ifdef OPENMP
-PCC = g++
+PCC = klang --runtime=kaapi
 PCFLAGS = -fopenmp -O2 -DOPENMP $(INTT)
 PLFLAGS = -fopenmp
 
