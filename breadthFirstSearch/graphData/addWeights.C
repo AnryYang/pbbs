@@ -44,7 +44,8 @@ int parallel_main(int argc, char* argv[]) {
   intT n = max(In.numCols, In.numRows);
   edge<intT>* E = In.E;
   wghEdge<intT>* WE = newA(wghEdge<intT>, m);
-  parallel_for(intT i=0; i < m; i++) {
+#pragma omp parallel for
+  for(intT i=0; i < m; i++) {
     WE[i] = wghEdge<intT>(E[i].u, E[i].v, hash<double>(i));
   }
   In.del();

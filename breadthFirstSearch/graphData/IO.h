@@ -61,13 +61,15 @@ namespace benchIO {
 
   // parallel code for converting a string to words
   words stringToWords(char *Str, long n) {
-    parallel_for (long i=0; i < n; i++) 
+#pragma omp parallel for
+    for (long i=0; i < n; i++) 
       if (isSpace(Str[i])) Str[i] = 0; 
 
     // mark start of words
     bool *FL = newA(bool,n);
     FL[0] = Str[0];
-    parallel_for (long i=1; i < n; i++) FL[i] = Str[i] && !Str[i-1];
+#pragma omp parallel for
+    for (long i=1; i < n; i++) FL[i] = Str[i] && !Str[i-1];
     
     // offset for each start of word
     _seq<long> Off = sequence::packIndex(FL, n);
@@ -76,7 +78,8 @@ namespace benchIO {
 
     // pointer to each start of word
     char **SA = newA(char*, m);
-    parallel_for (long j=0; j < m; j++) SA[j] = Str+offsets[j];
+#pragma omp parallel for
+    for (long j=0; j < m; j++) SA[j] = Str+offsets[j];
 
     free(offsets); free(FL);
     return words(Str,n,SA,m);
@@ -122,12 +125,16 @@ namespace benchIO {
   template <class T>
   _seq<char> arrayToString(T* A, long n) {
     long* L = newA(long,n);
-    {parallel_for(long i=0; i < n; i++) L[i] = xToStringLen(A[i])+1;}
+    {
+#pragma omp parallel for
+	    for(long i=0; i < n; i++) L[i] = xToStringLen(A[i])+1;}
     long m = sequence::scan(L,L,n,utils::addF<long>(),(long) 0);
     char* B = newA(char,m);
-    parallel_for(long j=0; j < m; j++) 
+#pragma omp parallel for
+    for(long j=0; j < m; j++) 
       B[j] = 0;
-    parallel_for(long i=0; i < n-1; i++) {
+#pragma omp parallel for
+    for(long i=0; i < n-1; i++) {
       xToString(B + L[i],A[i]);
       B[L[i+1] - 1] = '\n';
     }
@@ -201,7 +208,8 @@ namespace benchIO {
     }
     long n = W.m-1;
     intT* A = new intT[n];
-    parallel_for(long i=0; i < n; i++)
+#pragma omp parallel for
+    for(long i=0; i < n; i++)
       A[i] = atol(W.Strings[i+1]);
     return _seq<intT>(A,n);
   }

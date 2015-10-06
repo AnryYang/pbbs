@@ -100,7 +100,8 @@ namespace intSort {
     intT* oA = (intT*) (BK+blocks);
     intT* oB = (intT*) (BK+2*blocks);
 
-    parallel_for_1 (intT i=0; i < blocks; i++) {
+#pragma omp parallel for schedule (static,1)
+    for(intT i=0; i < blocks; i++) {
       intT od = i*nn;
       intT nni = min(max<intT>(n-od,0),nn);
       radixBlock(A+od, B, Tmp+od, cnts + m*i, oB + m*i, od, nni, m, extract);
@@ -158,7 +159,8 @@ namespace intSort {
       intT* offsets = BK[0];
       intT remain = numBK - BUCKETS - 1;
       float y = remain / (float) n;
-      parallel_for (int i=0; i < BUCKETS; i++) {
+#pragma omp parallel for 
+      for (int i=0; i < BUCKETS; i++) {
 	intT segOffset = offsets[i];
 	intT segNextOffset = (i == BUCKETS-1) ? n : offsets[i+1];
 	intT segLen = segNextOffset - segOffset;
@@ -206,7 +208,8 @@ namespace intSort {
     if (bits <= MAX_RADIX) {
       radixStep(A, B, Tmp, BK, numBK, n, (intT) 1 << bits, true, eBits<E,F>(bits,0,f));
       if (bucketOffsets != NULL) {
-	parallel_for (intT i=0; i < m; i++) 
+#pragma omp parallel for 
+	for (intT i=0; i < m; i++) 
 	  bucketOffsets[i] = BK[0][i];
       }
       return;
@@ -215,8 +218,12 @@ namespace intSort {
     else
       radixLoopTopDown(A, B, Tmp, BK, numBK, n, bits, f);
     if (bucketOffsets != NULL) {
-      {parallel_for (intT i=0; i < m; i++) bucketOffsets[i] = n;}
-      {parallel_for (intT i=0; i < n-1; i++) {
+      {
+#pragma omp parallel for 
+	      for (intT i=0; i < m; i++) bucketOffsets[i] = n;}
+      {
+#pragma omp parallel for 
+	      for (intT i=0; i < n-1; i++) {
 	  intT v = f(A[i]);
 	  intT vn = f(A[i+1]);
 	  if (v != vn) bucketOffsets[vn] = i+1;

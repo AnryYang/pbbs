@@ -71,7 +71,8 @@ edgeArray<intT> edgeRmat(intT n, intT m, intT seed,
   intT nn = (1 << utils::log2Up(n));
   rMat<intT> g(nn,seed,a,b,c);
   edge<intT>* E = newA(edge<intT>,m);
-  parallel_for (intT i = 0; i < m; i++) 
+#pragma omp parallel for
+  for (intT i = 0; i < m; i++) 
     E[i] = g(i);
   return edgeArray<intT>(E,nn,nn,m);
 }

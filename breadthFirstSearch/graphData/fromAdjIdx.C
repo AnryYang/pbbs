@@ -80,7 +80,8 @@ graph<intT> inputFiles(std::string prefix) {
   nr = fread(idx, sizeof(long), 1+numSets, fidx);
 
   vertex<intT> *vertices =  newA(vertex<intT>, numSets);
-  parallel_for(int i=0; i < numSets; i++)
+#pragma omp parallel for
+  for(int i=0; i < numSets; i++)
     vertices[i] = vertex<intT>((intT*) &tadj[idx[i]],idx[i+1]-idx[i]);
   free(idx);
   return graph<intT>(vertices, numSets, adjSize, (intT*) tadj);

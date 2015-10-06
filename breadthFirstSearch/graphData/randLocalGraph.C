@@ -41,7 +41,8 @@ template <class intT>
 edgeArray<intT> edgeRandomWithDimension(intT dim, intT degree, intT numRows) {
   intT nonZeros = numRows*degree;
   edge<intT> *E = newA(edge<intT>,nonZeros);
-  parallel_for (intT k=0; k < nonZeros; k++) {
+#pragma omp parallel for
+  for(intT k=0; k < nonZeros; k++) {
     intT i = k / degree;
     intT j;
     if (dim==0) {

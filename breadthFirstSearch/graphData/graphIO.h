@@ -72,7 +72,8 @@ namespace benchIO {
     intT *Out = newA(intT, totalLen);
     Out[0] = n;
     Out[1] = m;
-    parallel_for (intT i=0; i < n; i++) {
+#pragma omp parallel for 
+    for (intT i=0; i < n; i++) {
       Out[i+2] = G.V[i].degree;
     }
     intT total = sequence::scan(Out+2,Out+2,n,utils::addF<intT>(),(intT)0);
@@ -111,7 +112,9 @@ namespace benchIO {
     }
     intT n = (W.m-1)/2;
     edge<intT> *E = newA(edge<intT>,n);
-    {parallel_for(intT i=0; i < n; i++)
+    {
+#pragma omp parallel for 
+    for(intT i=0; i < n; i++)
       E[i] = edge<intT>(atol(W.Strings[2*i + 1]), 
 		  atol(W.Strings[2*i + 2]));}
     //W.del(); // to deal with performance bug in malloc
@@ -135,7 +138,9 @@ namespace benchIO {
     }
     intT n = (W.m-1)/3;
     wghEdge<intT> *E = newA(wghEdge<intT>,n);
-    {parallel_for(intT i=0; i < n; i++)
+    {
+#pragma omp parallel for 
+    for(intT i=0; i < n; i++)
       E[i] = wghEdge<intT>(atol(W.Strings[3*i + 1]), 
 			   atol(W.Strings[3*i + 2]),
 			   atof(W.Strings[3*i + 3]));}
@@ -160,7 +165,9 @@ namespace benchIO {
     }
     intT len = W.m -1;
     intT * In = newA(intT, len);
-    {parallel_for(intT i=0; i < len; i++) In[i] = atol(W.Strings[i + 1]);}
+    {
+#pragma omp parallel for 
+    for(intT i=0; i < len; i++) In[i] = atol(W.Strings[i + 1]);}
     //W.del(); // to deal with performance bug in malloc
 
     intT n = In[0];
@@ -172,7 +179,8 @@ namespace benchIO {
     vertex<intT> *v = newA(vertex<intT>,n);
     intT* offsets = In+2;
     intT* edges = In+2+n;
-    parallel_for (intT i=0; i < n; i++) {
+#pragma omp parallel for 
+    for (intT i=0; i < n; i++) {
       intT o = offsets[i];
       intT l = ((i == n-1) ? m : offsets[i+1])-offsets[i];
       v[i].degree = l;

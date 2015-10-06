@@ -53,7 +53,8 @@ class Table {
 
   // needs to be in separate routine due to Cilk bugs
   static void clearA(eType* A, intT n, eType v) {
-    parallel_for (intT i=0; i < n; i++) A[i] = v;
+#pragma omp parallel for 
+    for (intT i=0; i < n; i++) A[i] = v;
   }
 
   struct notEmptyF { 
@@ -226,7 +227,8 @@ class Table {
   // returns all the current entries compacted into a sequence
   _seq<eType> entries() {
     bool *FL = newA(bool,m);
-    parallel_for (intT i=0; i < m; i++) 
+#pragma omp parallel for 
+    for (intT i=0; i < m; i++) 
       FL[i] = (TA[i] != empty);
     _seq<eType> R = sequence::pack(TA,FL,m);
     free(FL);
@@ -247,7 +249,8 @@ template <class HASH, class ET, class intT>
 _seq<ET> removeDuplicates(_seq<ET> S, intT m, HASH hashF) {
   Table<HASH,intT> T(m,hashF);
   ET* A = S.A;
-  {parallel_for(intT i = 0; i < S.n; i++) { T.insert(A[i]);}}
+#pragma omp parallel for 
+  {for(intT i = 0; i < S.n; i++) { T.insert(A[i]);}}
   _seq<ET> R = T.entries();
   T.del(); 
   return R;

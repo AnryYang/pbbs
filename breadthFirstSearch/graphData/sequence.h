@@ -43,7 +43,8 @@ _seq(T* _A, long _n) : A(_A), n(_n) {}
 
 template <class E>
 void brokenCompiler__(intT n, E* x, E v) {
-  parallel_for(intT i=0; i<n; i++) x[i] = v;
+#pragma omp parallel for
+  for(intT i=0; i<n; i++) x[i] = v;
 }
 
 template <class E>
@@ -84,7 +85,7 @@ namespace sequence {
     intT _ee = _e;					\
     intT _n = _ee-_ss;					\
     intT _l = nblocks(_n,_bsize);			\
-    parallel_for (intT _i = 0; _i < _l; _i++) {		\
+    _Pragma("omp parallel for") for (intT _i = 0; _i < _l; _i++) {		\
       intT _s = _ss + _i * (_bsize);			\
       intT _e = min(_s + (_bsize), _ee);			\
       _body						\
@@ -332,7 +333,8 @@ namespace sequence {
   template <class ET, class intT, class PRED> 
   intT filter(ET* In, ET* Out, intT n, PRED p) {
     bool *Fl = newA(bool,n);
-    parallel_for (intT i=0; i < n; i++) Fl[i] = (bool) p(In[i]);
+#pragma omp parallel for
+    for (intT i=0; i < n; i++) Fl[i] = (bool) p(In[i]);
     intT  m = pack(In, Out, Fl, n);
     free(Fl);
     return m;
@@ -341,7 +343,8 @@ namespace sequence {
   template <class ET, class intT, class PRED> 
   _seq<ET> filter(ET* In, intT n, PRED p) {
     bool *Fl = newA(bool,n);
-    parallel_for (intT i=0; i < n; i++) Fl[i] = (bool) p(In[i]);
+#pragma omp parallel for
+    for (intT i=0; i < n; i++) Fl[i] = (bool) p(In[i]);
     _seq<ET> R = pack(In, Fl, n);
     free(Fl);
     return R;

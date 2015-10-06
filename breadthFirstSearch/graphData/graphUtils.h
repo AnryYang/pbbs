@@ -95,13 +95,15 @@ template <class intT>
 edgeArray<intT> remDuplicates(edgeArray<intT> A) {
   intT m = A.nonZeros;
   edge<intT> **EP = newA(edge<intT>*,m);
-  parallel_for (intT i=0;i < m; i++) EP[i] = A.E+i;
+#pragma omp parallel for
+  for (intT i=0;i < m; i++) EP[i] = A.E+i;
    _seq<edge<intT> *> F = removeDuplicates(_seq<edge<intT> *>(EP,m));
    //_seq<edge<intT>* > F = removeDuplicates(_seq<edge<intT> *>(EP,m),hashEdge<intT>());
   free(EP);
   intT l = F.n;
   edge<intT> *E = newA(edge<intT>,m);
-  parallel_for (intT j=0; j < l; j++) E[j] = *F.A[j];
+#pragma omp parallel for
+  for (intT j=0; j < l; j++) E[j] = *F.A[j];
   F.del();
   return edgeArray<intT>(E,A.numRows,A.numCols,l);
 }
@@ -115,7 +117,8 @@ edgeArray<intT> makeSymmetric(edgeArray<intT> A) {
   edge<intT> *E = A.E;
   edge<intT> *F = newA(edge<intT>,2*m);
   intT mm = sequence::filter(E,F,m,nEQF<intT>());
-  parallel_for (intT i=0; i < mm; i++) {
+#pragma omp parallel for
+  for (intT i=0; i < mm; i++) {
     F[i+mm].u = F[i].v;
     F[i+mm].v = F[i].u;
   }
@@ -134,7 +137,8 @@ graph<intT> graphFromEdges(edgeArray<intT> EA, bool makeSym) {
   if (makeSym) A = makeSymmetric<intT>(EA);
   else {  // should have copy constructor
     edge<intT> *E = newA(edge<intT>,EA.nonZeros);
-    parallel_for (intT i=0; i < EA.nonZeros; i++) E[i] = EA.E[i];
+#pragma omp parallel for
+    for (intT i=0; i < EA.nonZeros; i++) E[i] = EA.E[i];
     A = edgeArray<intT>(E,EA.numRows,EA.numCols,EA.nonZeros);
   }
   intT m = A.nonZeros;
@@ -143,7 +147,8 @@ graph<intT> graphFromEdges(edgeArray<intT> EA, bool makeSym) {
   intSort::iSort(A.E,offsets,m,n,getuF<intT>());
   intT *X = newA(intT,m);
   vertex<intT> *v = newA(vertex<intT>,n);
-  parallel_for (intT i=0; i < n; i++) {
+#pragma omp parallel for
+  for (intT i=0; i < n; i++) {
     intT o = offsets[i];
     intT l = ((i == n-1) ? m : offsets[i+1])-offsets[i];
     v[i].degree = l;
@@ -183,7 +188,8 @@ sparseRowMajor<eType,intT> sparseFromGraph(graph<intT> G) {
     start += V[i].degree;
   }
   Starts[numRows] = start;
-  parallel_for (intT j=0; j < numRows; j++)
+#pragma omp parallel for
+  for (intT j=0; j < numRows; j++)
     for (intT i = 0; i < (Starts[j+1] - Starts[j]); i++) {
       ColIds[Starts[j]+i] = V[j].Neighbors[i];
     }
@@ -198,7 +204,8 @@ graph<intT> graphReorder(graph<intT> Gr, intT* I) {
   bool noI = (I==NULL);
   if (noI) {
     I = newA(intT,Gr.n);
-    parallel_for (intT i=0; i < Gr.n; i++) I[i] = i;
+#pragma omp parallel for
+    for (intT i=0; i < Gr.n; i++) I[i] = i;
     random_shuffle(I,I+Gr.n);
   }
   vertex<intT> *V = newA(vertex<intT>,Gr.n);

@@ -43,7 +43,8 @@ edgeArray<intT> edge2DMesh(intT n) {
   intT nn = dn*dn;
   intT nonZeros = 2*nn;
   edge<intT> *E = newA(edge<intT>,nonZeros);
-  parallel_for (intT i=0; i < dn; i++)
+#pragma omp parallel for
+  for(intT i=0; i < dn; i++)
     for (intT j=0; j < dn; j++) {
       intT l = loc2d(dn,i,j);
       E[2*l] = edge<intT>(l,loc2d(dn,i+1,j));
@@ -63,7 +64,8 @@ edgeArray<intT> edge3DMesh(intT n) {
   intT nn = dn*dn*dn;
   intT nonZeros = 3*nn;
   edge<intT> *E = newA(edge<intT>,nonZeros);
-  parallel_for (intT i=0; i < dn; i++)
+#pragma omp parallel for
+  for(intT i=0; i < dn; i++)
     for (intT j=0; j < dn; j++) 
       for (intT k=0; k < dn; k++) {
 	intT l = loc3d(dn,i,j,k);

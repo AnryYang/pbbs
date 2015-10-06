@@ -22,7 +22,8 @@ int parallel_main(int argc, char* argv[]) {
   G.del();
 
   intT* A = newA(intT,EA.nonZeros);
-  parallel_for(int i=0;i<EA.nonZeros;i++){
+#pragma omp parallel for
+  for(int i=0;i<EA.nonZeros;i++){
     if(EA.E[i].u == EA.E[i].v) A[i] = 0;
     else A[i] = 1;
   }
@@ -32,7 +33,8 @@ int parallel_main(int argc, char* argv[]) {
     cout << m << " " << EA.nonZeros << endl;
     edge<intT>* E_packed = newA(edge<intT>,m);
     E_packed[0] = EA.E[0];
-    parallel_for(int i=1;i<EA.nonZeros;i++){
+#pragma omp parallel for
+    for(int i=1;i<EA.nonZeros;i++){
       if(A[i] != A[i]-1) E_packed[A[i]] = EA.E[i];
     }
     EA.nonZeros = m;

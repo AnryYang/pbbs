@@ -57,7 +57,8 @@ graph<intT> makePowerGraph(intT n) {
   intT degree = 15;
   intT *ngh = newA(intT, degree * n);
   vertex<intT> *V = newA(vertex<intT>, n);
-  parallel_for(intT i=0; i < n; i++) {
+#pragma omp parallel for
+  for(intT i=0; i < n; i++) {
     V[i].degree = degree;
     V[i].Neighbors = ngh + i * degree;
   }  
