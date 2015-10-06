@@ -249,8 +249,9 @@ template <class HASH, class ET, class intT>
 _seq<ET> removeDuplicates(_seq<ET> S, intT m, HASH hashF) {
   Table<HASH,intT> T(m,hashF);
   ET* A = S.A;
+  {
 #pragma omp parallel for 
-  {for(intT i = 0; i < S.n; i++) { T.insert(A[i]);}}
+  for(intT i = 0; i < S.n; i++) { T.insert(A[i]);}}
   _seq<ET> R = T.entries();
   T.del(); 
   return R;
