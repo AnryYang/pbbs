@@ -97,7 +97,7 @@ inline unsigned int hash2(unsigned int a)
 inline bool LCAS(long *ptr, long oldv, long newv) {
   unsigned char ret;
   /* Note that sete sets a 'byte' not the word */
-#if defined(__arm__)
+#if defined(__arm__) || defined(__aarch64__)
   return __sync_bool_compare_and_swap(ptr, oldv, newv);
 #else
   __asm__ __volatile__ (
@@ -115,7 +115,7 @@ inline bool LCAS(long *ptr, long oldv, long newv) {
 inline bool SCAS(int *ptr, int oldv, int newv) {
   unsigned char ret;
   /* Note that sete sets a 'byte' not the word */
-#if defined(__arm__)
+#if defined(__arm__) || defined(__aarch64__)
   return __sync_bool_compare_and_swap(ptr, oldv, newv);
 #else
   __asm__ __volatile__ (
